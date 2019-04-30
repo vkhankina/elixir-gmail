@@ -99,6 +99,21 @@ defmodule Gmail.Message do
   end
 
   @doc """
+  Sends a message (no attachments support, no threadId support)
+
+  Gmail API documentation: https://developers.google.com/gmail/api/v1/reference/users/messages/send
+  """
+
+  def send(user_id, %Mail.Message{} = message) do
+    {:post, base_url(), "users/#{user_id}/messages/send", %{
+      "raw" =>
+        message
+        |> Mail.Renderers.RFC2822.render()
+        |> Base.encode64(),
+    }}
+  end
+
+  @doc """
   Converts a Gmail API message resource into a local struct.
   """
   @spec convert(map) :: Message.t
@@ -153,5 +168,10 @@ defmodule Gmail.Message do
       {:ok, _} ->
         :ok
     end
+  end
+
+  def handle_send_response(response) do
+    response
+    |> handle_error()
   end
 end

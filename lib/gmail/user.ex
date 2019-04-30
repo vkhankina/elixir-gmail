@@ -189,6 +189,16 @@ defmodule Gmail.User do
     {:reply, result, state}
   end
 
+  @doc false
+  def handle_call({:message, {:send, message}}, _from, %{user_id: user_id} = state) do
+    result =
+      user_id
+      |> Message.send(message)
+      |> http_execute(state)
+      |> Message.handle_send_response
+    {:reply, result, state}
+  end
+
   #  }}} Messages #
 
   #  Attachments {{{ #
@@ -519,6 +529,25 @@ defmodule Gmail.User do
   @spec search(String.t, atom, String.t, map) :: atom
   def search(user_id, thread_or_message, query, params \\ %{}) do
     call(user_id, {:search, thread_or_message, query, params}, :infinity)
+  end
+
+  @doc """
+  Sends a message from specified user (no attachments support, no threadId support)
+
+  ## Examples
+
+      iex> msg =
+            Mail.build()
+            |> Mail.put_to("to@example.com")
+            |> Mail.put_from("from@example.com")
+            |> Mail.put_subject("Hello!")
+            |> Mail.put_text("Hello from Elixir!")
+
+          Gmail.User.send("from@example.com", msg)
+  """
+  @spec send(String.t, map) :: atom
+  def send(user_id, %Mail.Message{} = message) do
+    call(user_id, {:message, {:send, message}})
   end
 
   #  }}} Messages #

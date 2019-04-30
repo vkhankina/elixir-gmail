@@ -31,7 +31,8 @@ defmodule Gmail.Mixfile do
       {:credo, "~> 0.3", only: :dev},
       {:bypass, "~> 0.1", only: :test},
       {:inch_ex, "~> 0.5", only: :docs},
-      {:mix_test_watch, "~> 0.2", only: :dev}
+      {:mix_test_watch, "~> 0.2", only: :dev},
+      {:mail, github: "DockYard/elixir-mail"}
     ]
   end
 
