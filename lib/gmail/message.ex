@@ -109,7 +109,7 @@ defmodule Gmail.Message do
       "raw" =>
         message
         |> Mail.Renderers.RFC2822.render()
-        |> Base.encode64(),
+        |> Base.url_encode64(),
     }}
   end
 
