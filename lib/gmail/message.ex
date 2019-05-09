@@ -99,18 +99,29 @@ defmodule Gmail.Message do
   end
 
   @doc """
-  Sends a message (no attachments support, no threadId support)
+  Sends a message (no attachments support)
 
   Gmail API documentation: https://developers.google.com/gmail/api/v1/reference/users/messages/send
   """
 
-  def send(user_id, %Mail.Message{} = message) do
-    {:post, base_url(), "users/#{user_id}/messages/send", %{
+  def send(user_id, %Mail.Message{} = message, opts) do
+    thread_id = Keyword.get(opts, :thread_id)
+
+    attrs = %{
       "raw" =>
         message
         |> Mail.Renderers.RFC2822.render()
         |> Base.url_encode64(),
-    }}
+    }
+
+    attrs =
+      if not is_nil(thread_id) do
+        Map.put(attrs, "threadId", thread_id)
+      else
+        attrs
+      end
+
+    {:post, base_url(), "users/#{user_id}/messages/send", attrs}
   end
 
   @doc """

@@ -190,10 +190,10 @@ defmodule Gmail.User do
   end
 
   @doc false
-  def handle_call({:message, {:send, message}}, _from, %{user_id: user_id} = state) do
+  def handle_call({:message, {:send, message, opts}}, _from, %{user_id: user_id} = state) do
     result =
       user_id
-      |> Message.send(message)
+      |> Message.send(message, opts)
       |> http_execute(state)
       |> Message.handle_send_response
     {:reply, result, state}
@@ -532,7 +532,7 @@ defmodule Gmail.User do
   end
 
   @doc """
-  Sends a message from specified user (no attachments support, no threadId support)
+  Sends a message from specified user (no attachments support)
 
   ## Examples
 
@@ -545,9 +545,9 @@ defmodule Gmail.User do
 
           Gmail.User.send("from@example.com", msg)
   """
-  @spec send(String.t, map) :: atom
-  def send(user_id, %Mail.Message{} = message) do
-    call(user_id, {:message, {:send, message}})
+  @spec send(String.t, map, keyword) :: atom
+  def send(user_id, %Mail.Message{} = message, opts \\ []) do
+    call(user_id, {:message, {:send, message, opts}})
   end
 
   #  }}} Messages #
